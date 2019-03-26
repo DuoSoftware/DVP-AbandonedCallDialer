@@ -1,5 +1,6 @@
 let mongomodels = require('dvp-mongomodels');
 let mongoOp = require('./MongoDBOperations.js');
+let redisHandler = require('./RedisHandler.js');
 let config = require('config');
 let amqp = require('amqp');
 let logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
@@ -62,10 +63,13 @@ connection.on('ready', function()
                 let campObject = {
                     CampaignId: redialConfig[message.CompanyId].redialCampaignId,
                     PhoneNumber: message.SipFromUser,
-                    Uuid: message.Uuid
+                    Uuid: message.Uuid,
+                    CompanyId: message.CompanyId,
+                    TenantId: message.TenantId,
+                    HangupTime: message.HangupTime
                 };
 
-                ZAddObject("abandonedcalls", timestamp, campObject)
+                redisHandler.ZAddObject("abandonedcalls", timestamp, campObject)
             }
 
 
@@ -80,7 +84,19 @@ connection.on('error', function(e)
     amqpConState = 'CLOSE';
 });
 
+let CheckIsCallConnectedAndAddToCampaign = function(redialObj)
+{
+    //Async Function With Promise
+    //Check DB
+    //Call Campaign Manager Service
+}
+
 
 setInterval(() => {
     console.log('Infinite Loop Test interval');
-}, 2000);
+    let currenttimestamp = new Date().getTime();
+    redisHandler.ZRangeByScoreWithRemove("abandonedcalls", 0, currenttimestamp, (err, result)=>{
+        console.log(result);
+
+    })
+}, 10000);

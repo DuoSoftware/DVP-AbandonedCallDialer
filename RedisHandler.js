@@ -15,7 +15,7 @@ let redisSetting =  {
     host:redisip,
     family: 4,
     password: redispass,
-    db: 2,
+    db: 10,
     retryStrategy: function (times) {
         var delay = Math.min(times * 50, 2000);
         return delay;
@@ -43,7 +43,7 @@ if(redismode == 'sentinel'){
                 sentinels:sentinelConnections,
                 name: Config.Redis.sentinels.name,
                 password: redispass,
-                db: 2
+                db: 10
             }
 
         }else{
@@ -91,14 +91,50 @@ let ZAddObject = function(setname, key, value)
         {
             if(err)
             {
-                logger.error('[DVP-AbandonedCallDialer.ZAddObject] - REDIS ERROR', err)
+                logger.error('[DVP-AbandonedCallDialer.ZAddObject] - REDIS ERROR', err);
             }
         });
 
     }
     catch(ex)
     {
-        logger.error('[DVP-AbandonedCallDialer.ZAddObject] - REDIS ERROR', ex)
+        logger.error('[DVP-AbandonedCallDialer.ZAddObject] - REDIS ERROR', ex);
+    }
+
+};
+
+let ZRangeByScoreWithRemove = function(setname, minval, maxval, callback)
+{
+    let emptyArr = [];
+    try
+    {
+        client.zrangebyscore(setname, minval, maxval, function(err, response)
+        {
+            if(err)
+            {
+                logger.error('[DVP-AbandonedCallDialer.ZRangeByScoreGet] - REDIS ERROR', err);
+            }
+
+            client.zremrangebyscore(setname, minval, maxval, function(errRem, responseRem)
+            {
+                if(err)
+                {
+                    logger.error('[DVP-AbandonedCallDialer.ZRangeByScoreRemove] - REDIS ERROR', errRem);
+                }
+
+                callback(err, response);
+
+            });
+
+
+
+        });
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-AbandonedCallDialer.ZRangeByScore] - REDIS ERROR', ex);
+        callback(ex, emptyArr);
     }
 
 };
@@ -109,3 +145,4 @@ client.on('error', function(msg)
 });
 
 module.exports.ZAddObject = ZAddObject;
+module.exports.ZRangeByScoreWithRemove = ZRangeByScoreWithRemove;

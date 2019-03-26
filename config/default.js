@@ -17,7 +17,7 @@ module.exports = {
             "user": "duo",
             "password": "DuoS123",
             "sentinels":{
-                "hosts": "138.197.90.92,45.55.205.92,138.197.90.92",
+                "hosts": "138.197.90.92,45.55.205.92,162.243.81.39",
                 "port":16389,
                 "name":"redis-cluster"
             }
