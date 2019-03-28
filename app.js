@@ -1,9 +1,12 @@
 let mongomodels = require('dvp-mongomodels');
 let mongoOp = require('./MongoDBOperations.js');
 let redisHandler = require('./RedisHandler.js');
+let campManagerService = require('./CampaignManagerService.js');
+let dbHandler = require('./DBHandler.js');
 let config = require('config');
 let amqp = require('amqp');
 let logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+let async = require('async');
 
 let redialConfig = {};
 
@@ -66,7 +69,9 @@ connection.on('ready', function()
                     Uuid: message.Uuid,
                     CompanyId: message.CompanyId,
                     TenantId: message.TenantId,
-                    HangupTime: message.HangupTime
+                    HangupTime: message.HangupTime,
+                    CamScheduleId: redialConfig[message.CompanyId].camScheduleId,
+                    CategoryId: redialConfig[message.CompanyId].categoryId
                 };
 
                 redisHandler.ZAddObject("abandonedcalls", timestamp, campObject)
@@ -80,18 +85,69 @@ connection.on('ready', function()
 
 connection.on('error', function(e)
 {
-    logger.error('[DVP-EventMonitor.handler] - [%s] - AMQP Connection ERROR', e);
+    logger.error('[DVP-AbandonedCallDialer.MAIN] - [%s] - AMQP Connection ERROR', e);
     amqpConState = 'CLOSE';
 });
 
-let CheckIsCallConnectedAndAddToCampaign = function(redialObj)
+let CheckIsCallConnectedAndAddToCampaign = function(redialObj, callback)
 {
-    //Async Function With Promise
-    //Check DB
-    //Call Campaign Manager Service
-}
+    dbHandler.CheckCustomerCall(redialObj.PhoneNumber, redialObj.CompanyId, redialObj.TenantId, redialObj.Uuid, redialObj.HangupTime, function(err, count)
+    {
+        if(err) {
+            logger.error('[DVP-AbandonedCallDialer.CheckIsCallConnectedAndAddToCampaign] - Error', err);
+
+            callback(null, true);
+        }
+        else {
+            if(count > 0){
+                //stop operation
+
+                logger.debug('[DVP-AbandonedCallDialer.CheckIsCallConnectedAndAddToCampaign] - Caller has contacted');
+
+                callback(null, true);
+            }
+            else{
+                campManagerService.UploadNumber(redialObj.PhoneNumber, redialObj.CampaignId, redialObj.CamScheduleId, redialObj.CategoryId, redialObj.CompanyId, redialObj.TenantId, (err, result)=>{
+
+                    callback(null, true);
+                });
+            }
 
 
+        }
+
+    })
+};
+
+let CheckForNumbers = function(){
+
+    let currenttimestamp = new Date().getTime();
+    let asyncFuncArr = [];
+    redisHandler.ZRangeByScoreWithRemove("abandonedcalls", 0, currenttimestamp, (err, result)=>{
+        if(result.length > 0)
+        {
+            result.forEach(obj => {
+                asyncFuncArr.push(CheckIsCallConnectedAndAddToCampaign.bind(this, obj))
+            });
+
+            async.parallel(asyncFuncArr, function(err, results) {
+
+                setTimeout(CheckForNumbers, 10000);
+
+            });
+
+
+        }else{
+            setTimeout(CheckForNumbers, 10000);
+        }
+
+    })
+};
+
+CheckForNumbers();
+
+
+/*
 setInterval(() => {
     console.log('Infinite Loop Test interval');
     let currenttimestamp = new Date().getTime();
@@ -99,4 +155,4 @@ setInterval(() => {
         console.log(result);
 
     })
-}, 10000);
+}, 10000);*/

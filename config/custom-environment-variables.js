@@ -68,6 +68,11 @@ module.exports = {
         "Version":"HOST_VERSION"
     },
 
-    "Token": "HOST_TOKEN",
-    "SaveRawCDRMongo": "HOST_SAVE_CDR_MONGO"
+    "Campaign": {
+        "ip": 'SYS_CAMPAIGNMANAGER_HOST',
+        "port": 'SYS_CAMPAIGNMANAGER_PORT',
+        "version": 'SYS_CAMPAIGNMANAGER_VERSION'
+    },
+
+    "Token": "HOST_TOKEN"
 };
