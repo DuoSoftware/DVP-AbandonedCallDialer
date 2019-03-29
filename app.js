@@ -56,6 +56,8 @@ connection.on('ready', function()
 
             logger.debug('================ ABANDON CDR RECEIVED FROM QUEUE - UUID : ' + message.Uuid + ' ================');
 
+            console.log("========================");
+
             console.log('++++' + JSON.stringify(redialConfig));
 
             if(redialConfig[message.CompanyId] && redialConfig[message.CompanyId].redialTime && redialConfig[message.CompanyId].redialCampaignId && (message.QueueSec > redialConfig[message.CompanyId].abandonThreshold))
