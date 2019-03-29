@@ -64,7 +64,7 @@ module.exports = {
     },
 
     "Host":{
-        "Port":"HOST_CDREVENTLISTNER_PORT",
+        "Port":"HOST_ABANDONEDCALLDIALER_PORT",
         "Version":"HOST_VERSION"
     },
 

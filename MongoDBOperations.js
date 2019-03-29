@@ -13,7 +13,10 @@ function GetAbandonCallRedialConfig(callback){
 
         if(abandConfigList.length > 0)
         {
-            redialConfig[abandConfigList.company] = abandConfigList;
+            abandConfigList.forEach(config=>{
+                redialConfig[config.company] = config;
+            })
+
         }
 
         callback(err, redialConfig)

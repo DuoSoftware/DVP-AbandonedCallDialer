@@ -74,7 +74,10 @@ connection.on('ready', function()
                     CategoryId: redialConfig[message.CompanyId].categoryId
                 };
 
-                redisHandler.ZAddObject("abandonedcalls", timestamp, campObject)
+                redisHandler.ZAddObject("abandonedcalls", timestamp, JSON.stringify(campObject))
+            }
+            else {
+                logger.debug('Redial Config Not Found');
             }
 
 
@@ -127,18 +130,18 @@ let CheckForNumbers = function(){
         if(result.length > 0)
         {
             result.forEach(obj => {
-                asyncFuncArr.push(CheckIsCallConnectedAndAddToCampaign.bind(this, obj))
+                asyncFuncArr.push(CheckIsCallConnectedAndAddToCampaign.bind(this, JSON.parse(obj)))
             });
 
             async.parallel(asyncFuncArr, function(err, results) {
 
-                setTimeout(CheckForNumbers, 10000);
+                setTimeout(CheckForNumbers, 20000);
 
             });
 
 
         }else{
-            setTimeout(CheckForNumbers, 10000);
+            setTimeout(CheckForNumbers, 20000);
         }
 
     })
