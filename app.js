@@ -74,6 +74,8 @@ connection.on('ready', function()
                     CategoryId: redialConfig[message.CompanyId].categoryId
                 };
 
+                logger.debug('Adding object to redis');
+
                 redisHandler.ZAddObject("abandonedcalls", timestamp, JSON.stringify(campObject))
             }
             else {
