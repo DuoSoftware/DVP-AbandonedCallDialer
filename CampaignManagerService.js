@@ -50,7 +50,7 @@ let UploadNumber = function(phnNumber, campaignId, scheduleId, categoryId, compa
             logger.debug('[DVP-AbandonedCallDialer.UploadNumber] - Creating Api Url : %s, Body : %s', httpUrl, jsonStr);
 
 
-            httpReq.put(options, function (error, response, body)
+            httpReq.post(options, function (error, response, body)
             {
                 if (!error && response.statusCode >= 200 && response.statusCode <= 299)
                 {
