@@ -12,9 +12,6 @@ let UploadNumber = function(phnNumber, campaignId, scheduleId, categoryId, compa
     {
         logger.debug('[DVP-AbandonedCallDialer.UploadNumber] -  Creating PUT Message');
 
-        let phnNumArr = [];
-        phnNumArr.push(phnNumber);
-
         let campIp = config.Campaign.ip;
         let campPort = config.Campaign.port;
         let campVersion = config.Campaign.version;
@@ -25,14 +22,14 @@ let UploadNumber = function(phnNumber, campaignId, scheduleId, categoryId, compa
 
             let companyInfoHeader = tenantId + ':' + companyId;
 
-            let httpUrl = util.format('http://%s/DVP/API/%s/CampaignManager/CampaignNumbers', campIp, campVersion);
+            let httpUrl = util.format('http://%s/DVP/API/%s/CampaignManager/AbandonedCampaign/%s/Schedule/%s', campIp, campVersion, campaignId, scheduleId);
 
             if(validator.isIP(campIp))
             {
-                httpUrl = util.format('http://%s:%d/DVP/API/%s/CampaignManager/CampaignNumbers', campIp, campVersion);
+                httpUrl = util.format('http://%s:%d/DVP/API/%s/CampaignManager/AbandonedCampaign/%s/Schedule/%s', campIp, campPort, campVersion, campaignId, scheduleId);
             }
 
-            let jsonObj = { Contacts: phnNumArr, CampaignId: campaignId, CamScheduleId: scheduleId, CategoryID: categoryId };
+            let jsonObj = { contact_no: phnNumber, CampaignId: campaignId, CamScheduleId: scheduleId, CategoryID: categoryId };
 
             let jsonStr = JSON.stringify(jsonObj);
 

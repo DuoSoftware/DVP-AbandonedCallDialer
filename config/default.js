@@ -65,8 +65,8 @@ module.exports = {
     },
 
     "Campaign": {
-        "ip": 'campaignmanager.app1.veery.cloud',
-        "port": '4545',
+        "ip": '192.168.0.26',
+        "port": 8827,
         "version": '1.0.0.0'
     },
 
