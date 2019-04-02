@@ -6,7 +6,7 @@ let logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 
 let token = config.Token;
 
-let UploadNumber = function(phnNumber, campaignId, scheduleId, categoryId, companyId, tenantId, callback)
+let UploadNumber = function(phnNumber, campaignId, scheduleId, categoryId, companyId, tenantId, agentSkill, callback)
 {
     try
     {
@@ -29,7 +29,7 @@ let UploadNumber = function(phnNumber, campaignId, scheduleId, categoryId, compa
                 httpUrl = util.format('http://%s:%d/DVP/API/%s/CampaignManager/AbandonedCampaign/%s/Schedule/%s', campIp, campPort, campVersion, campaignId, scheduleId);
             }
 
-            let jsonObj = { contact_no: phnNumber, CampaignId: campaignId, CamScheduleId: scheduleId, CategoryID: categoryId };
+            let jsonObj = { contact_no: phnNumber, CampaignId: campaignId, CamScheduleId: scheduleId, CategoryID: categoryId, ExtraData: '{\"Skill\":\"' + agentSkill + '\"}'};
 
             let jsonStr = JSON.stringify(jsonObj);
 
