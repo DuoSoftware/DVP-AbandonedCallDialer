@@ -29,7 +29,7 @@ let UploadNumber = function(phnNumber, campaignId, scheduleId, categoryId, compa
                 httpUrl = util.format('http://%s:%d/DVP/API/%s/CampaignManager/AbandonedCampaign/%s/Schedule/%s', campIp, campPort, campVersion, campaignId, scheduleId);
             }
 
-            let jsonObj = { contact_no: phnNumber, CampaignId: campaignId, CamScheduleId: scheduleId, CategoryID: categoryId, ExtraData: '{\"Skill\":\"' + agentSkill + '\"}'};
+            let jsonObj = { contact_no: phnNumber, CampaignId: campaignId, CamScheduleId: scheduleId, CategoryID: categoryId, ExtraData: '{\"Skill\":\"' + agentSkill + '\", \"Type\": \"ABANDONED CALL CAMPAIGN\"}'};
 
             let jsonStr = JSON.stringify(jsonObj);
 
