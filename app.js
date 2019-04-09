@@ -157,7 +157,7 @@ let CheckForNumbers = function(){
 CheckForNumbers();
 
 
-/*
+/* comment
 setInterval(() => {
     console.log('Infinite Loop Test interval');
     let currenttimestamp = new Date().getTime();
