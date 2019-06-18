@@ -76,7 +76,8 @@ connection.on('ready', function()
                     HangupTime: message.HangupTime,
                     CamScheduleId: redialConfig[message.CompanyId].camScheduleId,
                     CategoryId: redialConfig[message.CompanyId].categoryId,
-                    AgentSkill: message.AgentSkill
+                    AgentSkill: message.AgentSkill,
+                    BusinessUnit: message.BusinessUnit
                 };
 
                 logger.debug('Adding object to redis');
@@ -117,7 +118,7 @@ let CheckIsCallConnectedAndAddToCampaign = function(redialObj, callback)
                 callback(null, true);
             }
             else{
-                campManagerService.UploadNumber(redialObj.PhoneNumber, redialObj.CampaignId, redialObj.CamScheduleId, redialObj.CategoryId, redialObj.CompanyId, redialObj.TenantId, redialObj.AgentSkill, (err, result)=>{
+                campManagerService.UploadNumber(redialObj.PhoneNumber, redialObj.CampaignId, redialObj.CamScheduleId, redialObj.CategoryId, redialObj.CompanyId, redialObj.TenantId, redialObj.AgentSkill, redialObj.BusinessUnit, (err, result)=>{
 
                     callback(null, true);
                 });
