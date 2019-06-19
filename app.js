@@ -62,27 +62,62 @@ connection.on('ready', function()
 
             if(redialConfig[message.CompanyId] && redialConfig[message.CompanyId].redialTime && redialConfig[message.CompanyId].redialCampaignId && (message.QueueSec > redialConfig[message.CompanyId].abandonThreshold))
             {
-                //Call is an abandon call - Add to Redis
-                let hangupTime = new Date(message.HangupTime);
-                hangupTime.setMinutes(hangupTime.getMinutes() + redialConfig[message.CompanyId].redialTime);
-                let timestamp = hangupTime.getTime();
+                if(message.BusinessUnit && redialConfig[message.CompanyId].businessUnits && redialConfig[message.CompanyId].businessUnits.length > 0)
+                {
+                    //Check
+                    if(redialConfig[message.CompanyId].businessUnits.indexOf(message.BusinessUnit) > -1)
+                    {
+                        let hangupTime = new Date(message.HangupTime);
+                        hangupTime.setMinutes(hangupTime.getMinutes() + redialConfig[message.CompanyId].redialTime);
+                        let timestamp = hangupTime.getTime();
 
-                let campObject = {
-                    CampaignId: redialConfig[message.CompanyId].redialCampaignId,
-                    PhoneNumber: message.SipFromUser,
-                    Uuid: message.Uuid,
-                    CompanyId: message.CompanyId,
-                    TenantId: message.TenantId,
-                    HangupTime: message.HangupTime,
-                    CamScheduleId: redialConfig[message.CompanyId].camScheduleId,
-                    CategoryId: redialConfig[message.CompanyId].categoryId,
-                    AgentSkill: message.AgentSkill,
-                    BusinessUnit: message.BusinessUnit
-                };
+                        let campObject = {
+                            CampaignId: redialConfig[message.CompanyId].redialCampaignId,
+                            PhoneNumber: message.SipFromUser,
+                            Uuid: message.Uuid,
+                            CompanyId: message.CompanyId,
+                            TenantId: message.TenantId,
+                            HangupTime: message.HangupTime,
+                            CamScheduleId: redialConfig[message.CompanyId].camScheduleId,
+                            CategoryId: redialConfig[message.CompanyId].categoryId,
+                            AgentSkill: message.AgentSkill,
+                            BusinessUnit: message.BusinessUnit
+                        };
 
-                logger.debug('Adding object to redis');
+                        logger.debug('Adding object to redis');
 
-                redisHandler.ZAddObject("abandonedcalls", timestamp, JSON.stringify(campObject))
+                        redisHandler.ZAddObject("abandonedcalls", timestamp, JSON.stringify(campObject))
+                    }
+                    else {
+                        logger.debug('Redial Config Not Found For BU');
+                    }
+
+                }
+                else{
+                    //Call is an abandon call - Add to Redis
+                    let hangupTime = new Date(message.HangupTime);
+                    hangupTime.setMinutes(hangupTime.getMinutes() + redialConfig[message.CompanyId].redialTime);
+                    let timestamp = hangupTime.getTime();
+
+                    let campObject = {
+                        CampaignId: redialConfig[message.CompanyId].redialCampaignId,
+                        PhoneNumber: message.SipFromUser,
+                        Uuid: message.Uuid,
+                        CompanyId: message.CompanyId,
+                        TenantId: message.TenantId,
+                        HangupTime: message.HangupTime,
+                        CamScheduleId: redialConfig[message.CompanyId].camScheduleId,
+                        CategoryId: redialConfig[message.CompanyId].categoryId,
+                        AgentSkill: message.AgentSkill,
+                        BusinessUnit: message.BusinessUnit
+                    };
+
+                    logger.debug('Adding object to redis');
+
+                    redisHandler.ZAddObject("abandonedcalls", timestamp, JSON.stringify(campObject))
+
+                }
+
             }
             else {
                 logger.debug('Redial Config Not Found');
