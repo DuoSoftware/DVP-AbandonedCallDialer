@@ -10,10 +10,20 @@ let async = require('async');
 
 let redialConfig = {};
 
-mongoOp.GetAbandonCallRedialConfig(function(err, redialConf)
-{
-    redialConfig = redialConf
-});
+let getAbandonConfig = function(){
+
+    logger.debug('[DVP-AbandonedCallDialer.GetAbandonConfig] - Getting Abandon Configuration');
+    mongoOp.GetAbandonCallRedialConfig(function(err, redialConf)
+    {
+        redialConfig = redialConf;
+        logger.debug('[DVP-AbandonedCallDialer.GetAbandonConfig] - %s', JSON.stringify(redialConfig));
+
+    });
+};
+
+getAbandonConfig();
+
+
 
 
 let ips = [];
@@ -56,8 +66,6 @@ connection.on('ready', function()
 
             logger.debug('================ ABANDON CDR RECEIVED FROM QUEUE - UUID : ' + message.Uuid + ' ================');
 
-            console.log("========================");
-
             console.log('++++' + JSON.stringify(redialConfig));
 
             if(redialConfig[message.CompanyId] && redialConfig[message.CompanyId].redialTime && redialConfig[message.CompanyId].redialCampaignId && (message.QueueSec > redialConfig[message.CompanyId].abandonThreshold))
@@ -67,6 +75,7 @@ connection.on('ready', function()
                     //Check
                     if(redialConfig[message.CompanyId].businessUnits.indexOf(message.BusinessUnit) > -1)
                     {
+                        logger.debug('Business Unit found on redial config');
                         let hangupTime = new Date(message.HangupTime);
                         hangupTime.setMinutes(hangupTime.getMinutes() + redialConfig[message.CompanyId].redialTime);
                         let timestamp = hangupTime.getTime();
@@ -95,6 +104,7 @@ connection.on('ready', function()
                 }
                 else{
                     //Call is an abandon call - Add to Redis
+                    logger.debug('Routing to default company abandon calls');
                     let hangupTime = new Date(message.HangupTime);
                     hangupTime.setMinutes(hangupTime.getMinutes() + redialConfig[message.CompanyId].redialTime);
                     let timestamp = hangupTime.getTime();
@@ -193,12 +203,6 @@ let CheckForNumbers = function(){
 CheckForNumbers();
 
 
-/* comment
 setInterval(() => {
-    console.log('Infinite Loop Test interval');
-    let currenttimestamp = new Date().getTime();
-    redisHandler.ZRangeByScoreWithRemove("abandonedcalls", 0, currenttimestamp, (err, result)=>{
-        console.log(result);
-
-    })
-}, 10000);*/
+    getAbandonConfig();
+}, 60000);
