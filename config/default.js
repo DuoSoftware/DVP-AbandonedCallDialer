@@ -49,6 +49,7 @@ module.exports = {
     password: "",
     user: "duo",
     replicaset: "1",
+    type: "mongodb+srv",
   },
 
   Host: {
