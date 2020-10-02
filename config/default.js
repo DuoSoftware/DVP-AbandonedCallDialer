@@ -62,7 +62,7 @@ module.exports = {
     ip: "192.168.0.26",
     port: 8827,
     version: "1.0.0.0",
-    dynamicPort: true,
+    dynamicPort: false,
   },
 
   Token:
