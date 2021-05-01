@@ -9,7 +9,7 @@ module.exports = {
     Password: "SYS_DATABASE_POSTGRES_PASSWORD",
     Port: "SYS_SQL_PORT",
     Host: "SYS_DATABASE_HOST",
-    Database: "SYS_DATABASE_POSTGRES_USER",
+    Database: "SYS_DATABASE_NAME",
   },
 
   Redis: {
@@ -45,6 +45,7 @@ module.exports = {
     password: "SYS_MONGO_PASSWORD",
     user: "SYS_MONGO_USER",
     replicaset: "SYS_MONGO_REPLICASETNAME",
+    type: "SYS_MONGO_TYPE",
   },
 
   RabbitMQ: {
@@ -56,6 +57,7 @@ module.exports = {
   },
 
   Host: {
+    Ip: "HOST_NAME",
     Port: "HOST_ABANDONEDCALLDIALER_PORT",
     Version: "HOST_VERSION",
   },
